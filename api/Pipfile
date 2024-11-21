@@ -8,7 +8,13 @@ fastapi = {extras = ["standard"], version = "*"}
 uvicorn = "*"
 pydantic-settings = "*"
 sqlmodel = "*"
-aiosqlite = "*"
+asyncpg = "*"
+flake8 = "*"
+flake8-pyproject = "*"
+greenlet = "*"
+coloredlogs = "*"
+nanoid = "*"
+random-username = "*"
 
 [dev-packages]
 

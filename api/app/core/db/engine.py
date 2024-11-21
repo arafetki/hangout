@@ -1,9 +1,21 @@
-from sqlalchemy.ext.asyncio import create_async_engine
-from sqlalchemy.pool import AsyncAdaptedQueuePool
+from sqlmodel import create_engine, SQLModel
+from sqlalchemy.ext.asyncio import AsyncEngine
 from config import settings
+from core.logging.logger import logger
 
-async_engine = create_async_engine(
-    url=settings.database_url,
-    echo=True,
-    poolclass=AsyncAdaptedQueuePool,
+async_engine = AsyncEngine(
+    create_engine(
+        url=settings.database_url,
+        echo=True,
+        pool_size=20,
+        max_overflow=5,
+    )
 )
+
+
+async def init_db():
+    async with async_engine.begin() as conn:
+        await conn.run_sync(lambda _: logger.info("database connection has been established sucessfully"))
+        from core.db.models.user import User
+
+        await conn.run_sync(SQLModel.metadata.create_all)
