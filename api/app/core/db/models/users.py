@@ -53,9 +53,6 @@ class CreateUserModel(BaseModel):
     last_name: Optional[str]
     gender: UserGender
 
-    class Config:
-        orm_mode = True
-
 
 class UpdateUserModel(BaseModel):
     username: Optional[str]
@@ -64,6 +61,3 @@ class UpdateUserModel(BaseModel):
     last_name: Optional[str]
     gender: Optional[UserGender]
     last_login: Optional[datetime]
-
-    class Config:
-        orm_mode = True

@@ -1,7 +1,7 @@
 from typing import AsyncGenerator
 from sqlalchemy.orm import sessionmaker
 from sqlmodel.ext.asyncio.session import AsyncSession
-from db.engine import async_engine
+from core.db.engine import async_engine
 
 async_session_factory = sessionmaker(
     bind=async_engine,
