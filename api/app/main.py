@@ -25,7 +25,7 @@ async def lifespan(app: FastAPI):
         yield
     finally:
         await async_engine.dispose()
-        logger.warning("server has stopped")
+        logger.warning(f"{settings.env} server has stopped")
 
 
 app = FastAPI(

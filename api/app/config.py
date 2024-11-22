@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     http_port: int = 8080
     debug: bool = True
     database_url: str
-    auth_webhook_secret: str
+    database_url_sync: str
 
 
 settings = Settings()
