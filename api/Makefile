@@ -22,3 +22,20 @@ help:
 ## Starts the API in development mode with auto-reload
 start-dev:
 	PYTHONPATH=./app uvicorn app.main:app --reload --host 0.0.0.0 --port $(HTTP_PORT) --loop asyncio
+
+
+.PHONY: migration/new
+## Add a new database migration
+migration/new:
+	@read -p "Enter migration message: " msg; \
+	alembic revision --autogenerate -m "$$msg"
+
+.PHONY: migration/up
+## apply all database migrations
+migration/up:
+	alembic upgrade head
+
+.PHONY: migration/down
+## apply all down database migrations
+migration/down:
+	alembic downgrade base

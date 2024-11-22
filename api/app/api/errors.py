@@ -1,7 +1,7 @@
 from fastapi import Request, status, HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from core.logging.logger import logger
+from app.core.logging.logger import logger
 
 
 async def http_exception_handler(request: Request, exc: HTTPException):

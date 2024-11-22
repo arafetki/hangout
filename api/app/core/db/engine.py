@@ -1,7 +1,7 @@
-from sqlmodel import create_engine, SQLModel
+from sqlmodel import create_engine
 from sqlalchemy.ext.asyncio import AsyncEngine
 from config import settings
-from core.logging.logger import logger
+from app.core.logging.logger import logger
 
 async_engine = AsyncEngine(
     create_engine(
@@ -15,7 +15,4 @@ async_engine = AsyncEngine(
 
 async def init_db():
     async with async_engine.begin() as conn:
-        await conn.run_sync(lambda _: logger.info("database connection has been established sucessfully"))
-        from core.db.models.users import User  # noqa: F401
-
-        await conn.run_sync(SQLModel.metadata.create_all)
+        await conn.run_sync(lambda _: logger.info("Database initialized"))

@@ -3,7 +3,7 @@ import time
 from fastapi import FastAPI, APIRouter, status, HTTPException
 from fastapi.exceptions import RequestValidationError
 from config import settings
-from api.schemas.health import HealthResponse, SystemInfos
+from api.schemas.health import HealthResponse
 from contextlib import asynccontextmanager
 from core.db.engine import init_db, async_engine
 from core.logging.logger import logger
@@ -48,11 +48,10 @@ app.add_exception_handler(Exception, unhandled_exception_handler)
 async def health_check_handler() -> HealthResponse:
     return HealthResponse(
         timestamp=time.time_ns(),
-        system_info=SystemInfos(env=settings.env, version=settings.version),
     )
 
 
-router = APIRouter(prefix=f"/{settings.version}", tags=["v1"])
+router = APIRouter(prefix=f"/{settings.version}")
 router.include_router(users_router)
 
 app.include_router(router)

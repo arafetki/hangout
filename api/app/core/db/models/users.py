@@ -2,9 +2,9 @@ from datetime import datetime, timezone
 from sqlmodel import SQLModel, Field, Column
 from typing import Optional
 import sqlalchemy.dialects.postgresql as pg
-from app.core.lib.nanoid import nanoid
-from core.utils.helpers import generate_random_username
-from core.utils.enums import UserGender
+from app.core.utils.nanoid import nanoid
+from app.core.utils.helpers import generate_random_username
+from app.core.utils.enums import UserGender
 
 
 class User(SQLModel, table=True):

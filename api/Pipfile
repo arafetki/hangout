@@ -16,6 +16,8 @@ coloredlogs = "*"
 nanoid = "*"
 random-username = "*"
 svix = "*"
+alembic = "*"
+psycopg2-binary = "*"
 
 [dev-packages]
 
