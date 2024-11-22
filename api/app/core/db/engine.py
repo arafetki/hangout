@@ -16,6 +16,6 @@ async_engine = AsyncEngine(
 async def init_db():
     async with async_engine.begin() as conn:
         await conn.run_sync(lambda _: logger.info("database connection has been established sucessfully"))
-        from core.db.models.user import User
+        from app.core.db.models.users import User  # noqa: F401
 
         await conn.run_sync(SQLModel.metadata.create_all)
