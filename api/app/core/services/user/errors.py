@@ -12,3 +12,7 @@ class UserUpdateError(Exception):
 
 class UserDeleteError(Exception):
     pass
+
+
+class IntegrityViolationError(Exception):
+    pass

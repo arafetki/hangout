@@ -1,16 +1,10 @@
 from datetime import datetime, timezone
 from sqlmodel import SQLModel, Field, Column
 from typing import Optional
-from enum import Enum
 import sqlalchemy.dialects.postgresql as pg
-from core.utils.nanoid import nanoid
+from app.core.lib.nanoid import nanoid
 from core.utils.helpers import generate_random_username
-from pydantic import BaseModel
-
-
-class UserGender(Enum):
-    FEMALE = "female"
-    MALE = "male"
+from core.utils.enums import UserGender
 
 
 class User(SQLModel, table=True):
@@ -45,19 +39,3 @@ class User(SQLModel, table=True):
             default=lambda: datetime.now(timezone.utc),
         ),
     )
-
-
-class CreateUserModel(BaseModel):
-    email: str
-    first_name: str
-    last_name: Optional[str]
-    gender: UserGender
-
-
-class UpdateUserModel(BaseModel):
-    username: Optional[str]
-    email: Optional[str]
-    firt_name: Optional[str]
-    last_name: Optional[str]
-    gender: Optional[UserGender]
-    last_login: Optional[datetime]

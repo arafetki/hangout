@@ -1,8 +1,16 @@
 from sqlmodel.ext.asyncio.session import AsyncSession
-from app.core.db.models.users import CreateUserModel, UpdateUserModel, User
+from core.db.models.users import User
+from core.lib.pydantic import CreateUserSchema, UpdateUserSchema
 from typing import Optional
 from sqlmodel import select, desc
-from core.services.errors import UserCreationError, UserNotFoundError, UserUpdateError, UserDeleteError
+from core.services.user.errors import (
+    UserCreationError,
+    UserNotFoundError,
+    UserUpdateError,
+    UserDeleteError,
+    IntegrityViolationError,
+)
+from sqlalchemy.exc import IntegrityError
 
 
 class UserService:
@@ -10,16 +18,22 @@ class UserService:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def create_user(self, user_data: CreateUserModel) -> User:
+    async def create_user(self, user_data: CreateUserSchema) -> User:
         new_user = User(**user_data.model_dump())
         self.session.add(new_user)
 
         try:
             await self.session.commit()
             return new_user
+        except IntegrityError as e:
+            await self.session.rollback()
+            if "unique constraint" in str(e.orig):
+                raise IntegrityViolationError("A user with this email already exists.")
+            raise IntegrityViolationError("A database integrity violation occurred.")
+
         except Exception as e:
             await self.session.rollback()
-            raise UserCreationError("An error occurred while creating the user.") from e
+            raise UserCreationError(f"An unkown error occurred while creating the user: {e}")
 
     async def get_all_users(self) -> list[User]:
         stmt = select(User).order_by(desc(User.created_at))
@@ -37,7 +51,7 @@ class UserService:
         result = await self.session.exec(stmt)
         return result.first()
 
-    async def update_user(self, user_id: str, user_data: UpdateUserModel) -> Optional[User]:
+    async def update_user(self, user_id: str, user_data: UpdateUserSchema) -> Optional[User]:
         user = await self.get_user(user_id)
         if not user:
             raise UserNotFoundError(f"User with ID {user_id} not found.")
@@ -49,7 +63,7 @@ class UserService:
             return user
         except Exception as e:
             await self.session.rollback()
-            raise UserUpdateError("An error occurred while updating the user.") from e
+            raise UserUpdateError(f"An error occurred while updating the user: {e}")
 
     async def delete_user(self, user_id: str):
         user = await self.get_user(user_id)
@@ -60,4 +74,4 @@ class UserService:
             await self.session.commit()
         except Exception as e:
             await self.session.rollback()
-            raise UserDeleteError("An error occurred while deleting the user.") from e
+            raise UserDeleteError(f"An error occurred while deleting the user: {e}")

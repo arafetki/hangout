@@ -15,6 +15,7 @@ greenlet = "*"
 coloredlogs = "*"
 nanoid = "*"
 random-username = "*"
+svix = "*"
 
 [dev-packages]
 
