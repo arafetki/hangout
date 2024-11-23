@@ -8,6 +8,10 @@ from api.schemas.users import (
     GetUserResponse,
 )
 from app.core.utils.helpers import is_valid_nanoid
+from app.core.logging.logger import logger
+from typing import Optional
+from app.core.data.user import UserFilterSchema
+from app.core.utils.enums import UserGender
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -17,13 +21,26 @@ async def get_user_service(session: AsyncSession = Depends(get_async_session)) -
 
 
 @router.get("/", response_model=GetAllUsersResponse)
-async def get_all_users_handler(user_service: UserService = Depends(get_user_service)) -> GetAllUsersResponse:
+async def get_users_handler(
+    user_service: UserService = Depends(get_user_service),
+    username: Optional[str] = None,
+    gender: Optional[UserGender] = None,
+    page_num: Optional[int] = None,
+    page_size: Optional[int] = None
+) -> GetAllUsersResponse:
     try:
-        users = await user_service.get_all_users()
+        filters = UserFilterSchema(username=username, gender=gender)
+        if page_num:
+            filters.page_num = page_num
+        if page_size:
+            filters.page_size = page_size
+        users = await user_service.get_users(filters=filters)
         return GetAllUsersResponse(data=users)
-    except Exception:
+    except Exception as e:
+        logger.error(f"Error: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred while fetching users."
         )
 
 

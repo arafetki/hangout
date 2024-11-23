@@ -3,6 +3,6 @@ line-length = 120
 target-version = ["py313"]
 
 [tool.flake8]
-exclude = .git/ __pycache__/ migrations/
+exclude = [".git/", "__pycache__/", "migrations/"]
 migrationsmax-line-length = 120
 extend-ignore = E203 W503

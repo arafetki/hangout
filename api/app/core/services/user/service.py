@@ -1,8 +1,8 @@
 from sqlmodel.ext.asyncio.session import AsyncSession
 from app.core.db.models.users import User
-from app.core.data.user import CreateUserParams, UpdateUserParams
+from app.core.data.user import CreateUserParams, UpdateUserParams, UserFilterSchema
 from typing import Optional
-from sqlmodel import select, desc
+from sqlmodel import select, desc, col, and_
 from app.core.services.user.errors import (
     UserCreationError,
     UserNotFoundError,
@@ -35,19 +35,24 @@ class UserService:
             await self.session.rollback()
             raise UserCreationError(f"An unkown error occurred while creating the user: {e}")
 
-    async def get_all_users(self) -> list[User]:
+    async def get_users(self,filters: Optional[UserFilterSchema] = None) -> list[User]:
         stmt = select(User).order_by(desc(User.created_at))
+        if filters:
+            conditions = []
+            if filters.username:
+                conditions.append(col(User.username).ilike(f"%{filters.username}%"))
+            if filters.gender:
+                conditions.append(col(User.gender) == filters.gender)
+            if conditions:
+                stmt = stmt.where(and_(*conditions))
+            # Apply pagination
+            stmt = stmt.offset(filters.offset()).limit(filters.page_size)
         result = await self.session.exec(stmt)
 
         return list(result.all())
 
     async def get_user_by_id(self, user_id: str) -> Optional[User]:
         stmt = select(User).where(User.id == user_id)
-        result = await self.session.exec(stmt)
-        return result.first()
-
-    async def get_user_by_username(self, username: str) -> Optional[User]:
-        stmt = select(User).where(User.username == username)
         result = await self.session.exec(stmt)
         return result.first()
 
