@@ -25,7 +25,7 @@ async def method_not_allowed_handler(request: Request, exc: HTTPException):
     return JSONResponse(status_code=status.HTTP_405_METHOD_NOT_ALLOWED, content={"detail": detail})
 
 
-async def validation_execption_handler(request: Request, exc: RequestValidationError):
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
     logger.error(f"Validation Error: {exc.errors()} - Path: {request.url.path}")
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,

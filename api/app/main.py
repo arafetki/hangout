@@ -5,14 +5,14 @@ from fastapi.exceptions import RequestValidationError
 from config import settings
 from api.schemas.health import HealthResponse
 from contextlib import asynccontextmanager
-from core.db.engine import init_db, async_engine
+from app.core.db.engine import init_db, async_engine
 from core.logging.logger import logger
 from api.routers.users import router as users_router
 from api.errors import (
     http_exception_handler,
     method_not_allowed_handler,
     not_found_handler,
-    validation_execption_handler,
+    validation_exception_handler,
     unhandled_exception_handler,
 )
 
@@ -39,7 +39,7 @@ app = FastAPI(
 app.add_exception_handler(status.HTTP_404_NOT_FOUND, not_found_handler)
 app.add_exception_handler(status.HTTP_405_METHOD_NOT_ALLOWED, method_not_allowed_handler)
 app.add_exception_handler(HTTPException, http_exception_handler)
-app.add_exception_handler(RequestValidationError, validation_execption_handler)
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(Exception, unhandled_exception_handler)
 
 
