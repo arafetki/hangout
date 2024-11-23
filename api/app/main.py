@@ -2,6 +2,7 @@ import time
 
 from fastapi import FastAPI, APIRouter, status, HTTPException
 from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
 from config import settings
 from api.schemas.health import HealthResponse
 from contextlib import asynccontextmanager
@@ -36,12 +37,20 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+
 app.add_exception_handler(status.HTTP_404_NOT_FOUND, not_found_handler)
 app.add_exception_handler(status.HTTP_405_METHOD_NOT_ALLOWED, method_not_allowed_handler)
 app.add_exception_handler(HTTPException, http_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(Exception, unhandled_exception_handler)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Health check endpoint for Reverse proxy / Load balancer
 @app.get("/health", response_model=HealthResponse, tags=["status"])
