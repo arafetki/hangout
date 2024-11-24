@@ -12,7 +12,6 @@ class User(SQLModel, table=True):
     id: str = Field(
         sa_column=Column(name="id", primary_key=True, type_=pg.CHAR(7), default=nanoid),
     )
-    email: str = Field(sa_column=Column(name="email", type_=pg.VARCHAR(255), unique=True, nullable=False, index=True))
     username: str = Field(
         sa_column=Column(
             name="username",
@@ -23,13 +22,11 @@ class User(SQLModel, table=True):
             index=True,
         ),
     )
+    email: str = Field(sa_column=Column(name="email", type_=pg.VARCHAR(255), unique=True, nullable=False, index=True))
     first_name: str = Field(sa_column=Column(name="first_name", type_=pg.VARCHAR(255), nullable=False))
     last_name: Optional[str] = Field(sa_column=Column(name="last_name", type_=pg.VARCHAR(255), nullable=True))
     gender: UserGender = Field(
-        sa_column=Column(name="gender", type_=pg.ENUM(UserGender, name="user_gender"), nullable=False, index=True),
-    )
-    last_login: Optional[datetime] = Field(
-        sa_column=Column(name="last_login", type_=pg.TIMESTAMP(timezone=True), nullable=True)
+        sa_column=Column(name="gender", type_=pg.ENUM(UserGender, name="user_gender"), nullable=False),
     )
     created_at: datetime = Field(
         sa_column=Column(

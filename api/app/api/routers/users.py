@@ -10,8 +10,6 @@ from api.schemas.users import (
 from app.core.utils.helpers import is_valid_nanoid
 from app.core.logging.logger import logger
 from typing import Optional
-from app.core.data.user import UserFilterSchema
-from app.core.utils.enums import UserGender
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -24,17 +22,9 @@ async def get_user_service(session: AsyncSession = Depends(get_async_session)) -
 async def get_users_handler(
     user_service: UserService = Depends(get_user_service),
     username: Optional[str] = None,
-    gender: Optional[UserGender] = None,
-    page_num: Optional[int] = None,
-    page_size: Optional[int] = None
 ) -> GetAllUsersResponse:
     try:
-        filters = UserFilterSchema(username=username, gender=gender)
-        if page_num:
-            filters.page_num = page_num
-        if page_size:
-            filters.page_size = page_size
-        users = await user_service.get_users(filters=filters)
+        users = await user_service.get_users(username=username)
         return GetAllUsersResponse(data=users)
     except Exception as e:
         logger.error(f"Error: {e}")

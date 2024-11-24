@@ -1,8 +1,8 @@
 from sqlmodel.ext.asyncio.session import AsyncSession
 from app.core.db.models.users import User
-from app.core.data.user import CreateUserParams, UpdateUserParams, UserFilterSchema
+from app.core.data.user import CreateUserParams, UpdateUserParams
 from typing import Optional
-from sqlmodel import select, desc, col, and_
+from sqlmodel import select, desc, col
 from app.core.services.user.errors import (
     UserCreationError,
     UserNotFoundError,
@@ -35,18 +35,10 @@ class UserService:
             await self.session.rollback()
             raise UserCreationError(f"An unkown error occurred while creating the user: {e}")
 
-    async def get_users(self,filters: Optional[UserFilterSchema] = None) -> list[User]:
+    async def get_users(self,username: Optional[str] = None) -> list[User]:
         stmt = select(User).order_by(desc(User.created_at))
-        if filters:
-            conditions = []
-            if filters.username:
-                conditions.append(col(User.username).ilike(f"%{filters.username}%"))
-            if filters.gender:
-                conditions.append(col(User.gender) == filters.gender)
-            if conditions:
-                stmt = stmt.where(and_(*conditions))
-            # Apply pagination
-            stmt = stmt.offset(filters.offset()).limit(filters.page_size)
+        if username:
+            stmt = stmt.where(col(User.username).ilike(f"%{username}%"))
         result = await self.session.exec(stmt)
 
         return list(result.all())
@@ -57,7 +49,7 @@ class UserService:
         return result.first()
 
     async def update_user(self, user_id: str, user_data: UpdateUserParams) -> Optional[User]:
-        user = await self.get_user(user_id)
+        user = await self.get_user_by_id(user_id)
         if not user:
             raise UserNotFoundError(f"User with ID {user_id} not found.")
         for k, v in user_data.model_dump(exclude_unset=True).items():
